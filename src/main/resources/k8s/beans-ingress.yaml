@@ -23,3 +23,24 @@ spec:
                 name: profile-svc
                 port:
                   number: 80
+          - path: /orders
+            pathType: Prefix
+            backend:
+              service:
+                name: order-svc
+                port:
+                  number: 80
+          - path: /menu
+            pathType: Prefix
+            backend:
+              service:
+                name: menu-svc
+                port:
+                  number: 80
+          - path: /coffee-shops
+            pathType: Prefix
+            backend:
+              service:
+                name: menu-svc
+                port:
+                  number: 80

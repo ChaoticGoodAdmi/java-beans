@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: menu-deployment
+  namespace: beans
+  labels:
+    app: menu
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: menu
+  template:
+    metadata:
+      labels:
+        app: menu
+    spec:
+      containers:
+        - name: menu
+          image: 2admi/beans-menu:0.0.1
+          ports:
+            - containerPort: 8002
+          env:
+            - name: DB_HOST
+              value: "mongo-menu"
+            - name: DB_PORT
+              value: "27017"
+            - name: DB_NAME
+              value: "beansmenu"
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: db-secrets
+                  key: MONGO_DB_USERNAME
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-secrets
+                  key: MONGO_DB_PASSWORD
