@@ -44,3 +44,8 @@ spec:
                 secretKeyRef:
                   name: db-secrets
                   key: JWT_SECRET_KEY
+            - name: BARISTA_REGISTRATION_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: db-secrets
+                  key: BARISTA_REGISTRATION_KEY
