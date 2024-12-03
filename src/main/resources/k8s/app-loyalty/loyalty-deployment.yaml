@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: loyalty-deployment
+  namespace: beans
+  labels:
+    app: loyalty
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: loyalty
+  template:
+    metadata:
+      labels:
+        app: loyalty
+    spec:
+      containers:
+        - name: loyalty
+          image: 2admi/beans-loyalty:0.0.1
+          ports:
+            - containerPort: 8004
+          env:
+            - name: LOYALTY_BONUS_PERCENTAGE
+              value: "0.05"
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: "kafka:9092"
+            - name: DB_HOST
+              value: "mongo-loyalty"
+            - name: DB_PORT
+              value: "27018"
+            - name: DB_NAME
+              value: "loyaltyeventstore"
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: db-secrets
+                  key: MONGO_DB_USERNAME
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-secrets
+                  key: MONGO_DB_PASSWORD
+            - name: REDIS_HOST
+              value: "loyalty-redis-svc"
+            - name: REDIS_PORT
+              value: "6379"
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-secrets
+                  key: REDIS_PASSWORD

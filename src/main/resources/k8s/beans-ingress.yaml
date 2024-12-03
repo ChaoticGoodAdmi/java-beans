@@ -44,3 +44,10 @@ spec:
                 name: menu-svc
                 port:
                   number: 80
+          - path: /loyalty
+            pathType: Prefix
+            backend:
+              service:
+                name: loyalty-svc
+                port:
+                  number: 80

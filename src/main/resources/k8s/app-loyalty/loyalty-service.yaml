@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: loyalty-svc
+  namespace: beans
+  labels:
+    app: loyalty
+spec:
+  selector:
+    app: loyalty
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8004
+  type: ClusterIP
