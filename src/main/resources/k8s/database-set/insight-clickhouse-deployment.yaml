@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: insight-clickhouse
+  namespace: beans
+  labels:
+    app: insight-clickhouse
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: insight-clickhouse
+  template:
+    metadata:
+      labels:
+        app: insight-clickhouse
+    spec:
+      containers:
+        - name: clickhouse
+          image: yandex/clickhouse-server:latest
+          ports:
+            - containerPort: 8123
+            - containerPort: 9000
+          volumeMounts:
+            - name: clickhouse-data
+              mountPath: /var/lib/clickhouse
+      volumes:
+        - name: clickhouse-data
+          persistentVolumeClaim:
+            claimName: clickhouse-pvc

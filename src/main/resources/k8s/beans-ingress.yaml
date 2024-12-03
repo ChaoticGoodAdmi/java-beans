@@ -51,3 +51,10 @@ spec:
                 name: loyalty-svc
                 port:
                   number: 80
+          - path: /insight
+            pathType: Prefix
+            backend:
+              service:
+                name: insight-svc
+                port:
+                  number: 80

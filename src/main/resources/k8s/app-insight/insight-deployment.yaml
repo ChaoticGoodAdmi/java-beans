@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: insight-deployment
+  namespace: beans
+  labels:
+    app: insight
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: insight
+  template:
+    metadata:
+      labels:
+        app: insight
+    spec:
+      containers:
+        - name: insight
+          image: 2admi/beans-insight:0.0.1
+          ports:
+            - containerPort: 8005
+          env:
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: "kafka:9092"
+            - name: CLICKHOUSE_HOST
+              value: insight-clickhouse-svc
+            - name: CLICKHOUSE_DB
+              value: default
+            - name: CLICKHOUSE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: db-secrets
+                  key: CLICKHOUSE_USERNAME
+            - name: CLICKHOUSE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-secrets
+                  key: CLICKHOUSE_PASSWORD
