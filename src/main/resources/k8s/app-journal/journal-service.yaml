@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: journal-svc
+  namespace: beans
+  labels:
+    app: journal
+spec:
+  selector:
+    app: journal
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8006
+  type: ClusterIP

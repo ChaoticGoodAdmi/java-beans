@@ -58,3 +58,10 @@ spec:
                 name: insight-svc
                 port:
                   number: 80
+          - path: /journal
+            pathType: Prefix
+            backend:
+              service:
+                name: journal-svc
+                port:
+                  number: 80
