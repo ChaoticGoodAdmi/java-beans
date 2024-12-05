@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: insight
-          image: 2admi/beans-insight:0.0.1
+          image: 2admi/beans-insight:1.0.0
           ports:
             - containerPort: 8005
           env:

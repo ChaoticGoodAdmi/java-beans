@@ -9,59 +9,10 @@ spec:
     - host: java.beans
       http:
         paths:
-          - path: /profile
+          - path: /
             pathType: Prefix
             backend:
               service:
-                name: profile-svc
-                port:
-                  number: 80
-          - path: /auth
-            pathType: Prefix
-            backend:
-              service:
-                name: profile-svc
-                port:
-                  number: 80
-          - path: /orders
-            pathType: Prefix
-            backend:
-              service:
-                name: order-svc
-                port:
-                  number: 80
-          - path: /menu
-            pathType: Prefix
-            backend:
-              service:
-                name: menu-svc
-                port:
-                  number: 80
-          - path: /coffee-shops
-            pathType: Prefix
-            backend:
-              service:
-                name: menu-svc
-                port:
-                  number: 80
-          - path: /loyalty
-            pathType: Prefix
-            backend:
-              service:
-                name: loyalty-svc
-                port:
-                  number: 80
-          - path: /insight
-            pathType: Prefix
-            backend:
-              service:
-                name: insight-svc
-                port:
-                  number: 80
-          - path: /journal
-            pathType: Prefix
-            backend:
-              service:
-                name: journal-svc
+                name: gateway-svc
                 port:
                   number: 80

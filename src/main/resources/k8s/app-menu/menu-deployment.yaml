@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: menu
-          image: 2admi/beans-menu:0.0.1
+          image: 2admi/beans-menu:1.0.0
           ports:
             - containerPort: 8002
           env:

@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: journal
-          image: 2admi/beans-journal:0.0.1
+          image: 2admi/beans-journal:1.0.0
           ports:
             - containerPort: 8002
           env:

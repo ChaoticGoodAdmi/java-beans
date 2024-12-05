@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: order
-          image: 2admi/beans-order:0.0.1
+          image: 2admi/beans-order:1.0.0
           ports:
             - containerPort: 8003
           env:

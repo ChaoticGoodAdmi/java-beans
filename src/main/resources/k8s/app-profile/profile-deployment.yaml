@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: profile
-          image: 2admi/beans-profile:0.0.1
+          image: 2admi/beans-profile:1.0.0
           ports:
             - containerPort: 8001
           env:

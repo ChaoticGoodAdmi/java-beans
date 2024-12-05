@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: loyalty
-          image: 2admi/beans-loyalty:0.0.1
+          image: 2admi/beans-loyalty:1.0.0
           ports:
             - containerPort: 8004
           env:
