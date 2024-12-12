@@ -1,0 +1,99 @@
+{
+	"id": "0ddc8cb6-f46e-46b3-aa04-626401d53f47",
+	"name": "Java Beans Demo",
+	"values": [
+		{
+			"key": "baseUrl",
+			"value": "http://java.beans",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "jwtToken",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "lastOrderId",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "guestEmail",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "orderId1",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "order1TotalCost",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "orderId2",
+			"value": "",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "order2TotalCost",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "currentPoints",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "usedPoints",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "expectedPoints",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "baristaEmail",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "baristaUserId",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "baristaJwtToken",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "createdDrinkId",
+			"value": "",
+			"type": "default",
+			"enabled": true
+		}
+	],
+	"_postman_variable_scope": "environment",
+	"_postman_exported_at": "2024-12-08T17:36:03.844Z",
+	"_postman_exported_using": "Postman/11.22.0"
+}

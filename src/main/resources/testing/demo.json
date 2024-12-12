@@ -1,0 +1,2213 @@
+{
+	"info": {
+		"_postman_id": "0fe3de39-3abb-40b8-907a-83cb1ca145b5",
+		"name": "Java Beans Demo",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "12899390"
+	},
+	"item": [
+		{
+			"name": "Use Case 1: Регистрация и аутентификация",
+			"item": [
+				{
+					"name": "Регистрация гостя",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"let randomNumber = Math.floor(Math.random() * 1000000);\r",
+									"let guestEmail = `newUser${randomNumber}@gmail.com`;\r",
+									"pm.environment.set(\"guestEmail\", guestEmail);\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Статус ответа - 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Ответ содержит userId\", function () {\r",
+									"    let jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData).to.have.property(\"userId\");\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"{{guestEmail}}\",\r\n    \"coffeeShopId\": \"674caf9933c2a30b95cceedf\",\r\n    \"password\": \"123456\",\r\n    \"firstName\": \"Kirill\",\r\n    \"lastName\": \"Ushakov\",\r\n    \"dateOfBirth\": \"1990-05-03\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/profile",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"profile"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Аутентификация гостя",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Статус ответа - 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Ответ содержит jwtToken\", function () {\r",
+									"    let jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData).to.have.property(\"jwtToken\");\r",
+									"    pm.environment.set(\"jwtToken\", \"Bearer \" + jsonData.jwtToken);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"jwtToken сохранен\", function () {\r",
+									"    let savedJwtToken = pm.environment.get(\"jwtToken\");\r",
+									"    pm.expect(savedJwtToken).to.exist;\r",
+									"    pm.expect(savedJwtToken).to.eql(\"Bearer \" + pm.response.json().jwtToken);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"{{guestEmail}}\",\r\n    \"password\": \"123456\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Use Case 2: Просмотр меню и детальной карточки товара",
+			"item": [
+				{
+					"name": "Получить список кофеен",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Статус ответа - 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"В ответе больше одной кофейни\", function () {\r",
+									"    let jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData).to.be.an(\"array\");\r",
+									"    pm.expect(jsonData.length).to.be.greaterThan(1);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{jwtToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/coffee-shops",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"coffee-shops"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Выбрать кофейню №1",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Статус ответа - 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Ответ содержит jwtToken\", function () {\r",
+									"    let jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData).to.have.property(\"jwtToken\");\r",
+									"    pm.environment.set(\"jwtToken\", \"Bearer \" + jsonData.jwtToken);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"jwtToken сохранен\", function () {\r",
+									"    let savedJwtToken = pm.environment.get(\"jwtToken\");\r",
+									"    pm.expect(savedJwtToken).to.exist;\r",
+									"    pm.expect(savedJwtToken).to.eql(\"Bearer \" + pm.response.json().jwtToken);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{jwtToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/profile?coffeeShopId=6751ae63bb2fd0137aa2dce7",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"profile"
+							],
+							"query": [
+								{
+									"key": "coffeeShopId",
+									"value": "6751ae63bb2fd0137aa2dce7"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Получить меню кофейни №1",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Статус ответа - 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"В ответе больше одного товара\", function () {\r",
+									"    let jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData).to.be.an(\"array\");\r",
+									"    pm.expect(jsonData.length).to.be.greaterThan(1);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"В меню содержатся и напитки, и десерты\", function () {\r",
+									"    let jsonData = pm.response.json();\r",
+									"\r",
+									"    let drinks = jsonData.filter(item => item.category === \"DRINKS\");\r",
+									"    let desserts = jsonData.filter(item => item.category === \"DESSERTS\");\r",
+									"\r",
+									"    pm.expect(drinks.length).to.be.greaterThan(0, \"Не найдены напитки\");\r",
+									"    pm.expect(desserts.length).to.be.greaterThan(0, \"Не найдены десерты\");\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{jwtToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/menu",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"menu"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Отфильтровать меню кофейни №1",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Статус ответа - 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"В ответе больше одного товара\", function () {\r",
+									"    let jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData).to.be.an(\"array\");\r",
+									"    pm.expect(jsonData.length).to.be.greaterThan(1);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"В меню содержатся только десерты\", function () {\r",
+									"    let jsonData = pm.response.json();\r",
+									"\r",
+									"    let drinks = jsonData.filter(item => item.category === \"DRINKS\");\r",
+									"    let desserts = jsonData.filter(item => item.category === \"DESSERTS\");\r",
+									"\r",
+									"    pm.expect(drinks.length).to.be.eq(0, \"Напитки есть в ответе\");\r",
+									"    pm.expect(desserts.length).to.be.greaterThan(0, \"Не найдены десерты\");\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{jwtToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/menu?category=DESSERTS",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"menu"
+							],
+							"query": [
+								{
+									"key": "category",
+									"value": "DESSERTS"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Выбрать кофейню №2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Статус ответа - 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Ответ содержит jwtToken\", function () {\r",
+									"    let jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData).to.have.property(\"jwtToken\");\r",
+									"    pm.environment.set(\"jwtToken\", \"Bearer \" + jsonData.jwtToken);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"jwtToken сохранен\", function () {\r",
+									"    let savedJwtToken = pm.environment.get(\"jwtToken\");\r",
+									"    pm.expect(savedJwtToken).to.exist;\r",
+									"    pm.expect(savedJwtToken).to.eql(\"Bearer \" + pm.response.json().jwtToken);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{jwtToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/profile?coffeeShopId=674caf9933c2a30b95cceedf",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"profile"
+							],
+							"query": [
+								{
+									"key": "coffeeShopId",
+									"value": "674caf9933c2a30b95cceedf"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Получить меню кофейни №2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Статус ответа - 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"В ответе больше одного товара\", function () {\r",
+									"    let jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData).to.be.an(\"array\");\r",
+									"    pm.expect(jsonData.length).to.be.greaterThan(1);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"В меню содержатся и напитки, и десерты\", function () {\r",
+									"    let jsonData = pm.response.json();\r",
+									"\r",
+									"    let drinks = jsonData.filter(item => item.category === \"DRINKS\");\r",
+									"    let desserts = jsonData.filter(item => item.category === \"DESSERTS\");\r",
+									"\r",
+									"    pm.expect(drinks.length).to.be.greaterThan(0, \"Не найдены напитки\");\r",
+									"    pm.expect(desserts.length).to.be.greaterThan(0, \"Не найдены десерты\");\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{jwtToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/menu",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"menu"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Отфильтровать меню кофейни",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Статус ответа - 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"В ответе больше одного товара\", function () {\r",
+									"    let jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData).to.be.an(\"array\");\r",
+									"    pm.expect(jsonData.length).to.be.greaterThan(1);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"В меню содержатся только напитки\", function () {\r",
+									"    let jsonData = pm.response.json();\r",
+									"\r",
+									"    let drinks = jsonData.filter(item => item.category === \"DRINKS\");\r",
+									"    let desserts = jsonData.filter(item => item.category === \"DESSERTS\");\r",
+									"\r",
+									"    pm.expect(drinks.length).to.be.greaterThan(0, \"Не найдены напитки\");\r",
+									"    pm.expect(desserts.length).to.be.eq(0, \"В ответе вернулись десерты\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Напитки отфильтровались по цене от 100 до 120\", function () {\r",
+									"    let jsonData = pm.response.json();\r",
+									"    let expensiveDrinks = jsonData.filter(item => item.price > 120.0)\r",
+									"\r",
+									"    pm.expect(expensiveDrinks.length).to.be.eq(0, \"В ответе вернулись напитки дороже фильтра\");\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{jwtToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/menu?category=DRINKS&priceRange=100,120",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"menu"
+							],
+							"query": [
+								{
+									"key": "category",
+									"value": "DRINKS"
+								},
+								{
+									"key": "priceRange",
+									"value": "100,120"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Просмотреть детальную информацию о товаре",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Статус ответа - 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"В ответе вернулся корректный товар - Triple Espresso\", function () {\r",
+									"    let jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData).to.have.property(\"name\");\r",
+									"    pm.expect(jsonData.name).to.eq(\"Triple Espresso\")\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{jwtToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/menu/item/67541b3fb4c6b7462c5facf8",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"menu",
+								"item",
+								"67541b3fb4c6b7462c5facf8"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Use Case 3: Создание заказа",
+			"item": [
+				{
+					"name": "Создание заказа №1",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"let requestData = JSON.parse(pm.request.body.raw);\r",
+									"\r",
+									"let totalCost = requestData.items.reduce((sum, item) => {\r",
+									"    return sum + (parseFloat(item.price) * item.quantity);\r",
+									"}, 0);\r",
+									"\r",
+									"pm.environment.set(\"order1TotalCost\", totalCost);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"let jsonData = pm.response.json();\r",
+									"pm.environment.set(\"orderId1\", jsonData.orderId);\r",
+									"\r",
+									"pm.test(\"Статус ответа - 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"В ответе вернулись поля: orderId, status = CREATED, createdAt\", function () {\r",
+									"    pm.expect(jsonData).to.have.property(\"orderId\");\r",
+									"    pm.expect(jsonData).to.have.property(\"status\");\r",
+									"    pm.expect(jsonData).to.have.property(\"createdAt\");\r",
+									"\r",
+									"    pm.expect(jsonData.orderId).to.be.a(\"number\");\r",
+									"    pm.expect(jsonData.status).to.eql(\"CREATED\");\r",
+									"    pm.expect(jsonData.createdAt).to.match(\r",
+									"        /^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d+$/\r",
+									"    );\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{jwtToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"items\": [\r\n        {\r\n            \"productId\": \"674cb5a533c2a30b95cceee0\",\r\n            \"quantity\": 2,\r\n            \"price\": \"150.0\"\r\n        },\r\n        {\r\n            \"productId\": \"674cb5f333c2a30b95cceee1\",\r\n            \"quantity\": 2,\r\n            \"price\": \"250.0\"\r\n        },\r\n        {\r\n            \"productId\": \"674cb6b033c2a30b95cceee4\",\r\n            \"quantity\": 5,\r\n            \"price\": \"70.0\"\r\n        }\r\n    ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/orders",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"orders"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Просмотр заказа №1",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"\r",
+									"pm.test(\"Статус ответа - 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Ответ содержит корректную структуру полей\", function () {\r",
+									"    let jsonData = pm.response.json();\r",
+									"\r",
+									"    pm.expect(jsonData).to.have.property(\"orderId\");\r",
+									"    pm.expect(jsonData).to.have.property(\"coffeeShopId\");\r",
+									"    pm.expect(jsonData).to.have.property(\"items\");\r",
+									"    pm.expect(jsonData).to.have.property(\"status\");\r",
+									"\r",
+									"    pm.expect(jsonData.orderId).to.be.a(\"number\");\r",
+									"    pm.expect(jsonData.coffeeShopId).to.be.a(\"string\");\r",
+									"    pm.expect(jsonData.status).to.eql(\"CREATED\");\r",
+									"\r",
+									"    pm.expect(jsonData.items).to.be.an(\"array\");\r",
+									"    pm.expect(jsonData.items.length).to.be.greaterThan(0);\r",
+									"\r",
+									"    jsonData.items.forEach((item, index) => {\r",
+									"        pm.test(`Товар №${index} содержит необходимые поля`, function () {\r",
+									"            pm.expect(item).to.have.property(\"productId\");\r",
+									"            pm.expect(item).to.have.property(\"quantity\");\r",
+									"            pm.expect(item.productId).to.be.a(\"string\");\r",
+									"            pm.expect(item.quantity).to.be.a(\"number\");\r",
+									"            pm.expect(item.quantity).to.be.greaterThan(0);\r",
+									"        });\r",
+									"    });\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{jwtToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/orders/{{orderId1}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"orders",
+								"{{orderId1}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Проверка баланса после заказа №1",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"\r",
+									"pm.test(\"Статус ответа - 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"let order1TotalCost = parseFloat(pm.environment.get(\"order1TotalCost\"));\r",
+									"let expectedPoints = Math.floor(order1TotalCost * 0.05);\r",
+									"let jsonData = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Баланс бонусного счета увеличился на корректное число (5% от стоимости заказа)\", function () {\r",
+									"    pm.expect(jsonData).to.have.property(\"currentPoints\");\r",
+									"    pm.expect(jsonData.currentPoints).to.eql(expectedPoints);\r",
+									"});\r",
+									"pm.environment.set(\"currentPoints\", jsonData.currentPoints);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{jwtToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/loyalty/balance",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"loyalty",
+								"balance"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Проверка истории бонусного счета",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"let currentPoints = Number(pm.environment.get(\"currentPoints\"));\r",
+									"let jsonData = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Ответ содержит ровно 1 событие с типом POINTS_ADDED\", function () {\r",
+									"    let pointsAddedObjects = jsonData.filter(item => item.type === \"POINTS_ADDED\");\r",
+									"\r",
+									"    pm.expect(pointsAddedObjects.length).to.eql(1);\r",
+									"    pm.expect(pointsAddedObjects[0].data).to.have.property(\"points\");\r",
+									"    pm.expect(pointsAddedObjects[0].data.points).to.eql(currentPoints);\r",
+									"});\r",
+									"pm.environment.get(\"currentPoints\", currentPoints);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{jwtToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/loyalty/history",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"loyalty",
+								"history"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Создание заказа №2",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"let requestData = JSON.parse(pm.request.body.raw);\r",
+									"usedPoints = Number(requestData.bonusPointsForPayment);\r",
+									"\r",
+									"let totalCost = requestData.items.reduce((sum, item) => {\r",
+									"    return sum + (parseFloat(item.price) * item.quantity);\r",
+									"}, 0);\r",
+									"\r",
+									"pm.environment.set(\"order2TotalCost\", totalCost - usedPoints);\r",
+									"pm.environment.set(\"usedPoints\", usedPoints);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"let jsonData = pm.response.json();\r",
+									"pm.environment.set(\"orderId2\", jsonData.orderId);\r",
+									"\r",
+									"pm.test(\"Статус ответа - 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"В ответе вернулись поля: orderId, status = CREATED, createdAt\", function () {\r",
+									"    pm.expect(jsonData).to.have.property(\"orderId\");\r",
+									"    pm.expect(jsonData).to.have.property(\"status\");\r",
+									"    pm.expect(jsonData).to.have.property(\"createdAt\");\r",
+									"\r",
+									"    pm.expect(jsonData.orderId).to.be.a(\"number\");\r",
+									"    pm.expect(jsonData.status).to.eql(\"CREATED\");\r",
+									"    pm.expect(jsonData.createdAt).to.match(\r",
+									"        /^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d+$/\r",
+									"    );\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{jwtToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"bonusPointsForPayment\": \"50\",\r\n    \"items\": [\r\n        {\r\n            \"productId\": \"674cb5a533c2a30b95cceee0\",\r\n            \"quantity\": 2,\r\n            \"price\": \"150.0\"\r\n        }\r\n    ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/orders",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"orders"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Проверка баланса после заказа №2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"\r",
+									"pm.test(\"Статус ответа - 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"let order2TotalCost = parseFloat(pm.environment.get(\"order2TotalCost\"));\r",
+									"let currentPoints = Number(pm.environment.get(\"currentPoints\"))\r",
+									"let usedPoints = Number(pm.environment.get(\"usedPoints\"))\r",
+									"let expectedPoints = currentPoints - usedPoints + Math.floor(order2TotalCost * 0.05);\r",
+									"pm.environment.set(\"expectedPoints\", expectedPoints);\r",
+									"let jsonData = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Баланс бонусного счета увеличился на корректное число (5% от стоимости заказа) и уменьшился на количество баллов, списаное при заказе\", function () {\r",
+									"    pm.expect(jsonData).to.have.property(\"currentPoints\");\r",
+									"    pm.expect(jsonData.currentPoints).to.eql(expectedPoints);\r",
+									"});\r",
+									"pm.environment.set(\"currentPoints\", jsonData.currentPoints);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{jwtToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/loyalty/balance",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"loyalty",
+								"balance"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Проверка истории бонусного счета №2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"let currentPoints = parseFloat(pm.environment.get(\"currentPoints\"));\r",
+									"let order1TotalCost = parseFloat(pm.environment.get(\"order1TotalCost\"));\r",
+									"let expectedPoints = Math.floor(order1TotalCost * 0.05);\r",
+									"\r",
+									"let jsonData = pm.response.json();\r",
+									"\r",
+									"pm.test(\"В ответе всего три записи об изменении баланса\", function () {\r",
+									"    pm.expect(jsonData.length).to.eql(3);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"В ответе две записи о зачислении бонусов за 2 созданных заказа\", function () {\r",
+									"    let pointsAddedObjects = jsonData.filter(item => item.type === \"POINTS_ADDED\");\r",
+									"    pm.expect(pointsAddedObjects.length).to.eql(2);\r",
+									"\r",
+									"    let matchingPointsAdded = pointsAddedObjects.filter(item => item.data.points === expectedPoints);\r",
+									"    pm.expect(matchingPointsAdded.length).to.be.greaterThan(0);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"В ответе одна запись о списании бонусов за второй заказ\", function () {\r",
+									"    let pointsUsedObjects = jsonData.filter(item => item.type === \"POINTS_USED\");\r",
+									"    pm.expect(pointsUsedObjects.length).to.eql(1);\r",
+									"});\r",
+									"\r",
+									"let totalPointsAdded = jsonData\r",
+									"    .filter(item => item.type === \"POINTS_ADDED\")\r",
+									"    .reduce((sum, item) => sum + item.data.points, 0);\r",
+									"\r",
+									"let totalPointsUsed = jsonData\r",
+									"    .filter(item => item.type === \"POINTS_USED\")\r",
+									"    .reduce((sum, item) => sum + item.data.points, 0);\r",
+									"\r",
+									"let calculatedCurrentPoints = totalPointsAdded - totalPointsUsed;\r",
+									"\r",
+									"pm.test(\"Сумма всех баллов совпадает с текущим состояним баланса\", function () {\r",
+									"    pm.expect(calculatedCurrentPoints).to.eql(currentPoints);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{jwtToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/loyalty/history",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"loyalty",
+								"history"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Use Case 4: Обновление меню",
+			"item": [
+				{
+					"name": "Регистрация бариста",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"let randomNumber = Math.floor(Math.random() * 1000000);\r",
+									"let baristaEmail = `newBarista${randomNumber}@gmail.com`;\r",
+									"pm.environment.set(\"baristaEmail\", baristaEmail);\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Статус ответа - 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"let jsonData = pm.response.json();\r",
+									"pm.test(\"Ответ содержит userId\", function () {\r",
+									"    pm.expect(jsonData).to.have.property(\"userId\");\r",
+									"});\r",
+									"pm.environment.set(\"baristaUserId\", jsonData.userId)"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"{{baristaEmail}}\",\r\n    \"coffeeShopId\": \"674caf9933c2a30b95cceedf\",\r\n    \"password\": \"123456\",\r\n    \"firstName\": \"Kirill\",\r\n    \"lastName\": \"Ushakov\",\r\n    \"dateOfBirth\": \"1990-05-03\",\r\n    \"role\": \"BARISTA\",\r\n    \"baristaSecretKey\": \"java-beans\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/profile",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"profile"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Аутентификация бариста",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Статус ответа - 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Ответ содержит jwtToken\", function () {\r",
+									"    let jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData).to.have.property(\"jwtToken\");\r",
+									"    pm.environment.set(\"baristaJwtToken\", \"Bearer \" + jsonData.jwtToken);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"jwtToken сохранен\", function () {\r",
+									"    let savedJwtToken = pm.environment.get(\"baristaJwtToken\");\r",
+									"    pm.expect(savedJwtToken).to.exist;\r",
+									"    pm.expect(savedJwtToken).to.eql(\"Bearer \" + pm.response.json().jwtToken);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"{{baristaEmail}}\",\r\n    \"password\": \"123456\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Получить меню до изменений",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Статус ответа - 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Вернулось ровно 2 напитка\", function () {\r",
+									"    let jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.length).to.eql(2);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Напитки имеют названия Americano и Green Tea\", function () {\r",
+									"    let jsonData = pm.response.json();\r",
+									"    let names = jsonData.map(item => item.name);\r",
+									"    pm.expect(names).to.include(\"Americano\");\r",
+									"    pm.expect(names).to.include(\"Green Tea\");\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{baristaJwtToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/menu?priceRange=0,120&category=DRINKS",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"menu"
+							],
+							"query": [
+								{
+									"key": "priceRange",
+									"value": "0,120"
+								},
+								{
+									"key": "category",
+									"value": "DRINKS"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Добавить товар в меню",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Статус ответа - 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"let jsonData = pm.response.json();\r",
+									"pm.test(\"Создан объект с названием Triple Espresso\", function () {\r",
+									"    pm.expect(jsonData.name).to.eql(\"Triple Espresso\");\r",
+									"    pm.expect(jsonData.active).to.eql(true);\r",
+									"});\r",
+									"pm.environment.set(\"createdDrinkId\", jsonData.id);\r",
+									"pm.test(\"Сохранение id объекта в переменную окружения\", function () {\r",
+									"    let createdDrinkId = pm.environment.get(\"createdDrinkId\");\r",
+									"    pm.expect(createdDrinkId).to.exist;\r",
+									"    pm.expect(createdDrinkId).to.not.be.empty;\r",
+									"    pm.expect(createdDrinkId).to.eql(jsonData.id);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{baristaJwtToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Triple Espresso\",\r\n    \"imageBase64\": \"base64encodedstring_for_espresso\",\r\n    \"category\": \"DRINKS\",\r\n    \"description\": \"Pain and suffering and probably not very good for your health.\",\r\n    \"price\": {\r\n        \"SMALL\": 80.00,\r\n        \"MEDIUM\": 100.00,\r\n        \"LARGE\": 120.00\r\n    },\r\n    \"calories\": 450,\r\n    \"protein\": 6.0,\r\n    \"fat\": 20.0,\r\n    \"carbs\": 60.0,\r\n    \"weight\": 150,\r\n    \"composition\": [\"Water\", \"Tears\"]\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/menu/item",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"menu",
+								"item"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Получить меню после добавления",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Статус ответа - 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Вернулось ровно 3 напитка\", function () {\r",
+									"    let jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.length).to.eql(3);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Напитки имеют названия Americano, Green Tea и Triple Espresso\", function () {\r",
+									"    let jsonData = pm.response.json();\r",
+									"    let names = jsonData.map(item => item.name);\r",
+									"    pm.expect(names).to.include(\"Americano\");\r",
+									"    pm.expect(names).to.include(\"Green Tea\");\r",
+									"    pm.expect(names).to.include(\"Triple Espresso\");\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{baristaJwtToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/menu?priceRange=0,120&category=DRINKS",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"menu"
+							],
+							"query": [
+								{
+									"key": "priceRange",
+									"value": "0,120"
+								},
+								{
+									"key": "category",
+									"value": "DRINKS"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Обновить товар в меню",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Статус ответа - 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"let jsonData = pm.response.json();\r",
+									"pm.test(\"Изменен объект с названием Triple Espresso\", function () {\r",
+									"    pm.expect(jsonData.name).to.eql(\"Triple Espresso\");\r",
+									"    pm.expect(jsonData.active).to.eql(false);\r",
+									"});\r",
+									"pm.test(\"Статус active изменился на false\", function () {\r",
+									"     pm.expect(jsonData.active).to.equal(false);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{baristaJwtToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"active\": false\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/menu/item/{{createdDrinkId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"menu",
+								"item",
+								"{{createdDrinkId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Получить меню после изменения товара",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Статус ответа - 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Вернулось ровно 2 напитка\", function () {\r",
+									"    let jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.length).to.eql(2);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Напитки имеют названия Americano и Green Tea\", function () {\r",
+									"    let jsonData = pm.response.json();\r",
+									"    let names = jsonData.map(item => item.name);\r",
+									"    pm.expect(names).to.include(\"Americano\");\r",
+									"    pm.expect(names).to.include(\"Green Tea\");\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{baristaJwtToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/menu?priceRange=0,120&category=DRINKS",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"menu"
+							],
+							"query": [
+								{
+									"key": "priceRange",
+									"value": "0,120"
+								},
+								{
+									"key": "category",
+									"value": "DRINKS"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Получить стоп-лист кофейни",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Статус ответа - 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Массив содержит товар с названием Triple Espresso и id из переменной окружения\", function () {\r",
+									"    let jsonData = pm.response.json();\r",
+									"    let createdDrinkId = pm.environment.get(\"createdDrinkId\");\r",
+									"\r",
+									"    let matchingItem = jsonData.find(item => item.name === \"Triple Espresso\" && item.id === createdDrinkId);\r",
+									"\r",
+									"    pm.expect(matchingItem).to.exist;\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{baristaJwtToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/menu/stop-list",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"menu",
+								"stop-list"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Удалить созданный товар",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Статус ответа - 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{baristaJwtToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/menu/item/{{createdDrinkId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"menu",
+								"item",
+								"{{createdDrinkId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Use Case 5: Управление заказами",
+			"item": [
+				{
+					"name": "Получить изначальный список заказов",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Статус ответа 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"let jsonData = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Ответ содержит объекты needToDeliver, needToFinish, needToPrepare\", function () {\r",
+									"    pm.expect(jsonData).to.have.property(\"needToDeliver\");\r",
+									"    pm.expect(jsonData).to.have.property(\"needToFinish\");\r",
+									"    pm.expect(jsonData).to.have.property(\"needToPrepare\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Все три объекта являются массивами\", function () {\r",
+									"    pm.expect(jsonData.needToDeliver).to.be.an(\"array\");\r",
+									"    pm.expect(jsonData.needToFinish).to.be.an(\"array\");\r",
+									"    pm.expect(jsonData.needToPrepare).to.be.an(\"array\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"needToDeliver и needToFinish пустые\", function () {\r",
+									"    pm.expect(jsonData.needToDeliver.length).to.eql(0);\r",
+									"    pm.expect(jsonData.needToFinish.length).to.eql(0);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"needToPrepare содержит 2 заказа со статусом CREATED\", function () {\r",
+									"    let createdItems = jsonData.needToPrepare.filter(item => item.status === \"CREATED\");\r",
+									"    pm.expect(createdItems.length).to.eql(2);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"id элементов в needToPrepare соответствуют id созданных ранее заказов\", function () {\r",
+									"    let orderId1 = pm.environment.get(\"orderId1\");\r",
+									"    let orderId2 = pm.environment.get(\"orderId2\");\r",
+									"\r",
+									"    let createdItems = jsonData.needToPrepare.filter(item => item.status === \"CREATED\");\r",
+									"    let ids = createdItems.map(item => item.orderId);\r",
+									"\r",
+									"    pm.expect(ids).to.include(orderId1);\r",
+									"    pm.expect(ids).to.include(orderId2);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{baristaJwtToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/orders/coffee-shop",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"orders",
+								"coffee-shop"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Изменить статус заказа №1 на IN_PROGRESS",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Статус ответа 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"let jsonData = pm.response.json();\r",
+									"\r",
+									"pm.test(\"orderId соответствует переменной окружения orderId1\", function () {\r",
+									"    let orderId1 = pm.environment.get(\"orderId1\");\r",
+									"    pm.expect(jsonData.orderId).to.eql(parseInt(orderId1));\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Статус равен IN_PROGRESS\", function () {\r",
+									"    pm.expect(jsonData.status).to.eql(\"IN_PROGRESS\");\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{baristaJwtToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"status\": \"IN_PROGRESS\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/orders/{{orderId1}}/status",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"orders",
+								"{{orderId1}}",
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Получить список заказов после изменения №1",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Статус ответа 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"let jsonData = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Ответ содержит три объекта\", function () {\r",
+									"    pm.expect(jsonData).to.have.property(\"needToDeliver\");\r",
+									"    pm.expect(jsonData).to.have.property(\"needToFinish\");\r",
+									"    pm.expect(jsonData).to.have.property(\"needToPrepare\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"needToDeliver пустой массив\", function () {\r",
+									"    pm.expect(jsonData.needToDeliver).to.be.an(\"array\");\r",
+									"    pm.expect(jsonData.needToDeliver.length).to.eql(0);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"needToFinish содержит заказ с orderId1 и статусом IN_PROGRESS\", function () {\r",
+									"    let orderId1 = parseInt(pm.environment.get(\"orderId1\"));\r",
+									"    pm.expect(jsonData.needToFinish).to.be.an(\"array\");\r",
+									"    pm.expect(jsonData.needToFinish.length).to.eql(1);\r",
+									"    pm.expect(jsonData.needToFinish[0].orderId).to.eql(orderId1);\r",
+									"    pm.expect(jsonData.needToFinish[0].status).to.eql(\"IN_PROGRESS\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"needToPrepare содержит заказ с orderId2 и статусом CREATED\", function () {\r",
+									"    let orderId2 = parseInt(pm.environment.get(\"orderId2\"));\r",
+									"    pm.expect(jsonData.needToPrepare).to.be.an(\"array\");\r",
+									"    pm.expect(jsonData.needToPrepare.length).to.eql(1);\r",
+									"    pm.expect(jsonData.needToPrepare[0].orderId).to.eql(orderId2);\r",
+									"    pm.expect(jsonData.needToPrepare[0].status).to.eql(\"CREATED\");\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{baristaJwtToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/orders/coffee-shop",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"orders",
+								"coffee-shop"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Изменить статус заказа №1 на READY",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Статус ответа 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"let jsonData = pm.response.json();\r",
+									"\r",
+									"pm.test(\"orderId соответствует переменной окружения orderId1\", function () {\r",
+									"    let orderId1 = pm.environment.get(\"orderId1\");\r",
+									"    pm.expect(jsonData.orderId).to.eql(parseInt(orderId1));\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Статус равен READY\", function () {\r",
+									"    pm.expect(jsonData.status).to.eql(\"READY\");\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{baristaJwtToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"status\": \"READY\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/orders/{{orderId1}}/status",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"orders",
+								"{{orderId1}}",
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Получить список заказов после изменения №1 Copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Статус ответа 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"let jsonData = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Ответ содержит три объекта\", function () {\r",
+									"    pm.expect(jsonData).to.have.property(\"needToDeliver\");\r",
+									"    pm.expect(jsonData).to.have.property(\"needToFinish\");\r",
+									"    pm.expect(jsonData).to.have.property(\"needToPrepare\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"needToDeliver содержит заказ с orderId1 и статусом READY\", function () {\r",
+									"    let orderId1 = parseInt(pm.environment.get(\"orderId1\"));\r",
+									"    pm.expect(jsonData.needToDeliver).to.be.an(\"array\");\r",
+									"    pm.expect(jsonData.needToDeliver.length).to.eql(1);\r",
+									"    pm.expect(jsonData.needToDeliver[0].orderId).to.eql(orderId1);\r",
+									"    pm.expect(jsonData.needToDeliver[0].status).to.eql(\"READY\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"needToFinish пустой массив\", function () {\r",
+									"    pm.expect(jsonData.needToFinish).to.be.an(\"array\");\r",
+									"    pm.expect(jsonData.needToFinish.length).to.eql(0);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"needToPrepare содержит заказ с orderId2 и статусом CREATED\", function () {\r",
+									"    let orderId2 = parseInt(pm.environment.get(\"orderId2\"));\r",
+									"    pm.expect(jsonData.needToPrepare).to.be.an(\"array\");\r",
+									"    pm.expect(jsonData.needToPrepare.length).to.eql(1);\r",
+									"    pm.expect(jsonData.needToPrepare[0].orderId).to.eql(orderId2);\r",
+									"    pm.expect(jsonData.needToPrepare[0].status).to.eql(\"CREATED\");\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{baristaJwtToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/orders/coffee-shop",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"orders",
+								"coffee-shop"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Изменить статус заказа №1 на DELIVERED",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Статус ответа 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"let jsonData = pm.response.json();\r",
+									"\r",
+									"pm.test(\"orderId соответствует переменной окружения orderId1\", function () {\r",
+									"    let orderId1 = pm.environment.get(\"orderId1\");\r",
+									"    pm.expect(jsonData.orderId).to.eql(parseInt(orderId1));\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Статус равен DELIVERED\", function () {\r",
+									"    pm.expect(jsonData.status).to.eql(\"DELIVERED\");\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{baristaJwtToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"status\": \"DELIVERED\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/orders/{{orderId1}}/status",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"orders",
+								"{{orderId1}}",
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Изменить статус заказа №2 на DELIVERED",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Статус ответа 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"let jsonData = pm.response.json();\r",
+									"\r",
+									"pm.test(\"orderId соответствует переменной окружения orderId2\", function () {\r",
+									"    let orderId2 = pm.environment.get(\"orderId2\");\r",
+									"    pm.expect(jsonData.orderId).to.eql(parseInt(orderId2));\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Статус равен DELIVERED\", function () {\r",
+									"    pm.expect(jsonData.status).to.eql(\"DELIVERED\");\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{baristaJwtToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"status\": \"DELIVERED\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/orders/{{orderId2}}/status",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"orders",
+								"{{orderId2}}",
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Получить финальный список заказов",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Статус ответа 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"let jsonData = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Ответ содержит объекты needToDeliver, needToFinish, needToPrepare\", function () {\r",
+									"    pm.expect(jsonData).to.have.property(\"needToDeliver\");\r",
+									"    pm.expect(jsonData).to.have.property(\"needToFinish\");\r",
+									"    pm.expect(jsonData).to.have.property(\"needToPrepare\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Все три объекта являются массивами\", function () {\r",
+									"    pm.expect(jsonData.needToDeliver).to.be.an(\"array\");\r",
+									"    pm.expect(jsonData.needToFinish).to.be.an(\"array\");\r",
+									"    pm.expect(jsonData.needToPrepare).to.be.an(\"array\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Все три массива пустые\", function () {\r",
+									"    pm.expect(jsonData.needToDeliver.length).to.eql(0);\r",
+									"    pm.expect(jsonData.needToFinish.length).to.eql(0);\r",
+									"    pm.expect(jsonData.needToPrepare.length).to.eql(0);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{baristaJwtToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/orders/coffee-shop",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"orders",
+								"coffee-shop"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Получить выручку кофейни",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Статус ответа 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"let jsonData = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Ответ содержит поле profit\", function () {\r",
+									"    pm.expect(jsonData).to.have.property(\"profit\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"profit является положительным числом\", function () {\r",
+									"    pm.expect(jsonData.profit).to.be.a(\"number\");\r",
+									"    pm.expect(jsonData.profit).to.be.greaterThan(0);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{baristaJwtToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/insight/profit",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"insight",
+								"profit"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Получить популярные товары",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Статус ответа 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"let jsonData = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Ответ содержит объект topItems\", function () {\r",
+									"    pm.expect(jsonData).to.have.property(\"topItems\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"topItems является непустым массивом с 10 элементами\", function () {\r",
+									"    pm.expect(jsonData.topItems).to.be.an(\"array\");\r",
+									"    pm.expect(jsonData.topItems.length).to.eql(10);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{baristaJwtToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/insight/items",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"insight",
+								"items"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Получить статистику по кофейне",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Статус ответа 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"let jsonData = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Ответ содержит поля coffeeShopId, totalOrders, averageCheck\", function () {\r",
+									"    pm.expect(jsonData).to.have.property(\"coffeeShopId\");\r",
+									"    pm.expect(jsonData).to.have.property(\"totalOrders\");\r",
+									"    pm.expect(jsonData).to.have.property(\"averageCheck\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"totalOrders и averageCheck являются положительными числами\", function () {\r",
+									"    pm.expect(jsonData.totalOrders).to.be.a(\"number\");\r",
+									"    pm.expect(jsonData.totalOrders).to.be.greaterThan(0);\r",
+									"    pm.expect(jsonData.averageCheck).to.be.a(\"number\");\r",
+									"    pm.expect(jsonData.averageCheck).to.be.greaterThan(0);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{baristaJwtToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/insight/stats",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"insight",
+								"stats"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
