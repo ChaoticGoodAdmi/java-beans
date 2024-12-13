@@ -1,28 +1,27 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: gateway-deployment
+  name: menu-redis
   namespace: beans
-  labels:
-    app: gateway
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: gateway
+      app: menu-redis
   template:
     metadata:
       labels:
-        app: gateway
+        app: menu-redis
     spec:
       containers:
-        - name: gateway
-          image: 2admi/beans-gateway:1.0.0
+        - name: redis
+          image: redis:6.2
           ports:
-            - containerPort: 8001
+            - containerPort: 6379
           env:
-            - name: JWT_SECRET_KEY
+            - name: REDIS_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: db-secrets
-                  key: JWT_SECRET_KEY
+                  key: REDIS_PASSWORD
+          args: ["--requirepass", "$(REDIS_PASSWORD)"]

@@ -22,7 +22,7 @@ spec:
             - containerPort: 8002
           env:
             - name: DB_HOST
-              value: "mongo-menu"
+              value: "mongo-menu-0.mongo-menu.beans.svc.cluster.local:27017,mongo-menu-1.mongo-menu.beans.svc.cluster.local:27017,mongo-menu-2.mongo-menu.beans.svc.cluster.local:27017"
             - name: DB_PORT
               value: "27017"
             - name: DB_NAME
@@ -37,3 +37,14 @@ spec:
                 secretKeyRef:
                   name: db-secrets
                   key: MONGO_DB_PASSWORD
+            - name: DB_REPLICASET
+              value: "rs0"
+            - name: REDIS_HOST
+              value: "menu-redis-svc"
+            - name: REDIS_PORT
+              value: "16379"
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-secrets
+                  key: REDIS_PASSWORD

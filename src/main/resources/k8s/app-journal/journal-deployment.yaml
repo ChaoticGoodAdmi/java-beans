@@ -26,7 +26,7 @@ spec:
             - name: DB_HOST
               value: "mongo-journal"
             - name: DB_PORT
-              value: "27018"
+              value: "27019"
             - name: DB_NAME
               value: "beansjournal"
             - name: DB_USER
