@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: cockroachdb-profile
+  namespace: beans
+spec:
+  serviceName: cockroachdb-profile
+  replicas: 3
+  selector:
+    matchLabels:
+      app: cockroachdb-profile
+  template:
+    metadata:
+      labels:
+        app: cockroachdb-profile
+    spec:
+      containers:
+        - name: cockroachdb
+          image: cockroachdb/cockroach:v21.2.11
+          command:
+            - "/cockroach/cockroach"
+          args:
+            - "start"
+            - "--insecure"
+            - "--advertise-addr=$(HOSTNAME).cockroachdb-profile"
+            - "--join=cockroachdb-profile-0.cockroachdb-profile,cockroachdb-profile-1.cockroachdb-profile,cockroachdb-profile-2.cockroachdb-profile"
+            - "--http-addr=0.0.0.0:8080"
+          env:
+            - name: HOSTNAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+          ports:
+            - containerPort: 26257
+              name: grpc
+            - containerPort: 8080
+              name: http
+          volumeMounts:
+            - name: cockroachdb-data
+              mountPath: /cockroach/cockroach-data
+  volumeClaimTemplates:
+    - metadata:
+        name: cockroachdb-data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 1Gi

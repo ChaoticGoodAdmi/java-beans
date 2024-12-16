@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: profile-redis
+  namespace: beans
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: profile-redis
+  template:
+    metadata:
+      labels:
+        app: profile-redis
+    spec:
+      containers:
+        - name: redis
+          image: redis:6.2
+          ports:
+            - containerPort: 6379
+          env:
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-secrets
+                  key: REDIS_PASSWORD
+          args: ["--requirepass", "$(REDIS_PASSWORD)"]

@@ -24,21 +24,24 @@ spec:
             - name: KAFKA_BOOTSTRAP_SERVERS
               value: "kafka:9092"
             - name: DB_HOST
-              value: "postgres-profile"
+              value: "cockroachdb-profile"
             - name: DB_PORT
-              value: "5432"
+              value: "26257"
             - name: DB_NAME
               value: "profile_db"
             - name: DB_USER
-              valueFrom:
-                secretKeyRef:
-                  name: db-secrets
-                  key: DB_USERNAME
+              value: "root"
             - name: DB_PASSWORD
+              value: ""
+            - name: "REDIS_HOST"
+              value: "profile-redis-svc"
+            - name: "REDIS_PORT"
+              value: "6379"
+            - name: REDIS_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: db-secrets
-                  key: DB_PASSWORD
+                  key: REDIS_PASSWORD
             - name: JWT_SECRET_KEY
               valueFrom:
                 secretKeyRef:

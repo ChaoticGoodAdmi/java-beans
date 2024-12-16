@@ -6,7 +6,7 @@ metadata:
   labels:
     app: order
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       app: order
@@ -24,18 +24,21 @@ spec:
             - name: KAFKA_BOOTSTRAP_SERVERS
               value: "kafka:9092"
             - name: DB_HOST
-              value: "postgres-order"
+              value: "cockroachdb-order"
             - name: DB_PORT
-              value: "5433"
+              value: "26257"
             - name: DB_NAME
               value: "order_db"
             - name: DB_USER
-              valueFrom:
-                secretKeyRef:
-                  name: db-secrets
-                  key: DB_USERNAME
+              value: "root"
             - name: DB_PASSWORD
+              value: ""
+            - name: "REDIS_HOST"
+              value: "order-redis-svc"
+            - name: "REDIS_PORT"
+              value: "6379"
+            - name: REDIS_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: db-secrets
-                  key: DB_PASSWORD
+                  key: REDIS_PASSWORD
