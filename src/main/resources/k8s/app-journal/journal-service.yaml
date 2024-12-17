@@ -5,6 +5,7 @@ metadata:
   namespace: beans
   labels:
     app: journal
+    type: application
 spec:
   selector:
     app: journal

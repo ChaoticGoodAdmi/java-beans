@@ -5,6 +5,7 @@ metadata:
   namespace: beans
   labels:
     app: menu
+    type: application
 spec:
   selector:
     app: menu

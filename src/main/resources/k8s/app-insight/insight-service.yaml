@@ -5,6 +5,7 @@ metadata:
   namespace: beans
   labels:
     app: insight
+    type: application
 spec:
   selector:
     app: insight

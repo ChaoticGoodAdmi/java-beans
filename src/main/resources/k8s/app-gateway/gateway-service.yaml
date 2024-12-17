@@ -5,6 +5,7 @@ metadata:
   namespace: beans
   labels:
     app: gateway
+    type: application
 spec:
   selector:
     app: gateway

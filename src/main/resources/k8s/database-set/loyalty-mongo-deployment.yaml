@@ -1,12 +1,13 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: mongo-loyalty
   namespace: beans
   labels:
     app: mongo-loyalty
 spec:
-  replicas: 1
+  serviceName: mongo-loyalty
+  replicas: 3
   selector:
     matchLabels:
       app: mongo-loyalty
@@ -16,26 +17,22 @@ spec:
         app: mongo-loyalty
     spec:
       containers:
-        - name: mongo-loyalty
+        - name: mongo
           image: mongo:latest
           ports:
             - containerPort: 27017
+          command:
+            - mongod
+            - "--bind_ip_all"
+            - "--noauth"
+            - "--replSet"
+            - "rs0"
           env:
-            - name: MONGO_INITDB_ROOT_USERNAME
-              valueFrom:
-                secretKeyRef:
-                  name: db-secrets
-                  key: MONGO_DB_USERNAME
-            - name: MONGO_INITDB_ROOT_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: db-secrets
-                  key: MONGO_DB_PASSWORD
-            - name: MONGO_INITDB_DATABASE
-              value: loyaltyeventstore
+            - name: MONGO_REPLICA_SET
+              value: "rs0"
           volumeMounts:
-            - name: mongo-data-loyalty
+            - name: mongo-data
               mountPath: /data/db
       volumes:
-        - name: mongo-data-loyalty
+        - name: mongo-data
           emptyDir: {}

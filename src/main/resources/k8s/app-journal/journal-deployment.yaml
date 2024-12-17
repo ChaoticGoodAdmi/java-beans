@@ -6,7 +6,7 @@ metadata:
   labels:
     app: journal
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: journal
@@ -24,9 +24,9 @@ spec:
             - name: KAFKA_BOOTSTRAP_SERVERS
               value: "kafka:9092"
             - name: DB_HOST
-              value: "mongo-journal"
+              value: "mongo-journal-0.mongo-journal.beans.svc.cluster.local:27017,mongo-journal-1.mongo-journal.beans.svc.cluster.local:27017,mongo-journal-2.mongo-journal.beans.svc.cluster.local:27017"
             - name: DB_PORT
-              value: "27019"
+              value: "27017"
             - name: DB_NAME
               value: "beansjournal"
             - name: DB_USER
@@ -39,3 +39,5 @@ spec:
                 secretKeyRef:
                   name: db-secrets
                   key: MONGO_DB_PASSWORD
+            - name: DB_REPLICASET
+              value: "rs0"

@@ -6,7 +6,7 @@ metadata:
   labels:
     app: loyalty
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: loyalty
@@ -26,9 +26,9 @@ spec:
             - name: KAFKA_BOOTSTRAP_SERVERS
               value: "kafka:9092"
             - name: DB_HOST
-              value: "mongo-loyalty"
+              value: "mongo-loyalty-0.mongo-loyalty.beans.svc.cluster.local:27017,mongo-loyalty-1.mongo-loyalty.beans.svc.cluster.local:27017,mongo-loyalty-2.mongo-loyalty.beans.svc.cluster.local:27017"
             - name: DB_PORT
-              value: "27018"
+              value: "27017"
             - name: DB_NAME
               value: "loyaltyeventstore"
             - name: DB_USER
@@ -41,6 +41,8 @@ spec:
                 secretKeyRef:
                   name: db-secrets
                   key: MONGO_DB_PASSWORD
+            - name: DB_REPLICASET
+              value: "rs0"
             - name: REDIS_HOST
               value: "loyalty-redis-svc"
             - name: REDIS_PORT

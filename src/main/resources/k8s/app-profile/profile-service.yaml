@@ -5,6 +5,7 @@ metadata:
   namespace: beans
   labels:
     app: profile
+    type: application
 spec:
   selector:
     app: profile

@@ -5,6 +5,7 @@ metadata:
   namespace: beans
   labels:
     app: loyalty
+    type: application
 spec:
   selector:
     app: loyalty
