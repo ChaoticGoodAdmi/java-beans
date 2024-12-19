@@ -1,0 +1,213 @@
+apiVersion: chaos-mesh.org/v1alpha1
+kind: Workflow
+metadata:
+  name: java-beans-chaos-testing
+  namespace: chaos-testing
+spec:
+  entry: entry
+  templates:
+    - name: entry
+      templateType: Parallel
+      children:
+        - pod-kills-apps
+        - pod-kills-storages
+    - name: pod-kills-apps
+      templateType: Parallel
+      children:
+        - pod-kill-profile
+        - pod-kill-menu
+        - pod-kill-order
+        - pod-kill-loyalty
+        - pod-kill-insight
+        - pod-kill-journal
+        - pod-kill-gateway
+      deadline: 60s
+    - name: pod-kills-storages
+      templateType: Parallel
+      children:
+        - pod-kill-db-profile
+        - pod-kill-db-menu
+        - pod-kill-db-order
+        - pod-kill-db-loyalty
+        - pod-kill-db-journal
+      deadline: 60s
+    - name: pod-kill-profile
+      templateType: Schedule
+      schedule:
+        schedule: '* * * * *'
+        historyLimit: 3
+        concurrencyPolicy: Allow
+        type: PodChaos
+        podChaos:
+          action: pod-kill
+          selector:
+            namespaces:
+              - beans
+            labelSelectors:
+              app: order
+          mode: one
+    - name: pod-kill-order
+      templateType: Schedule
+      schedule:
+        schedule: '* * * * *'
+        historyLimit: 3
+        concurrencyPolicy: Allow
+        type: PodChaos
+        podChaos:
+          action: pod-kill
+          selector:
+            namespaces:
+              - beans
+            labelSelectors:
+              app: profile
+          mode: one
+    - name: pod-kill-menu
+      templateType: Schedule
+      schedule:
+        schedule: '* * * * *'
+        historyLimit: 3
+        concurrencyPolicy: Allow
+        type: PodChaos
+        podChaos:
+          action: pod-kill
+          selector:
+            namespaces:
+              - beans
+            labelSelectors:
+              app: menu
+          mode: one
+    - name: pod-kill-loyalty
+      templateType: Schedule
+      schedule:
+        schedule: '* * * * *'
+        historyLimit: 3
+        concurrencyPolicy: Allow
+        type: PodChaos
+        podChaos:
+          action: pod-kill
+          selector:
+            namespaces:
+              - beans
+            labelSelectors:
+              app: loyalty
+          mode: one
+    - name: pod-kill-insight
+      templateType: Schedule
+      schedule:
+        schedule: '* * * * *'
+        historyLimit: 3
+        concurrencyPolicy: Allow
+        type: PodChaos
+        podChaos:
+          action: pod-kill
+          selector:
+            namespaces:
+              - beans
+            labelSelectors:
+              app: insight
+          mode: one
+    - name: pod-kill-journal
+      templateType: Schedule
+      schedule:
+        schedule: '* * * * *'
+        historyLimit: 3
+        concurrencyPolicy: Allow
+        type: PodChaos
+        podChaos:
+          action: pod-kill
+          selector:
+            namespaces:
+              - beans
+            labelSelectors:
+              app: journal
+          mode: one
+    - name: pod-kill-gateway
+      templateType: Schedule
+      schedule:
+        schedule: '* * * * *'
+        historyLimit: 3
+        concurrencyPolicy: Allow
+        type: PodChaos
+        podChaos:
+          action: pod-kill
+          selector:
+            namespaces:
+              - beans
+            labelSelectors:
+              app: gateway
+          mode: one
+    - name: pod-kill-db-profile
+      templateType: Schedule
+      schedule:
+        schedule: '* * * * *'
+        historyLimit: 3
+        concurrencyPolicy: Allow
+        type: PodChaos
+        podChaos:
+          action: pod-kill
+          selector:
+            namespaces:
+              - beans
+            labelSelectors:
+              app: cockroachdb-profile
+          mode: one
+    - name: pod-kill-db-order
+      templateType: Schedule
+      schedule:
+        schedule: '* * * * *'
+        historyLimit: 3
+        concurrencyPolicy: Allow
+        type: PodChaos
+        podChaos:
+          action: pod-kill
+          selector:
+            namespaces:
+              - beans
+            labelSelectors:
+              app: cockroachdb-order
+          mode: one
+    - name: pod-kill-db-menu
+      templateType: Schedule
+      schedule:
+        schedule: '5 * * * *'
+        historyLimit: 3
+        concurrencyPolicy: Allow
+        type: PodChaos
+        podChaos:
+          action: pod-kill
+          selector:
+            namespaces:
+              - beans
+            labelSelectors:
+              app: mongo-menu
+          mode: one
+    - name: pod-kill-db-loyalty
+      templateType: Schedule
+      schedule:
+        schedule: '* * * * *'
+        historyLimit: 3
+        concurrencyPolicy: Allow
+        type: PodChaos
+        podChaos:
+          action: pod-kill
+          selector:
+            namespaces:
+              - beans
+            labelSelectors:
+              app: mongo-loyalty
+          mode: one
+    - name: pod-kill-db-journal
+      templateType: Schedule
+      schedule:
+        schedule: '* * * * *'
+        historyLimit: 3
+        concurrencyPolicy: Allow
+        type: PodChaos
+        podChaos:
+          action: pod-kill
+          selector:
+            namespaces:
+              - beans
+            labelSelectors:
+              app: mongo-journal
+          mode: one
